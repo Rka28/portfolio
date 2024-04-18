@@ -5,10 +5,8 @@ import profile from '../asset/profil.png';
 import pro from '../asset/pro.jpg';
 import cinema from '../asset/cinema.png';
 import { gsap } from "gsap";
-
 import { useEffect } from "react";
 import Anim from "../Contact/Contact.js";
-
 import { IoPin } from "react-icons/io5";
 import { FaHtml5 } from "react-icons/fa";
 import { FaCss3Alt } from "react-icons/fa";
