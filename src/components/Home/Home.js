@@ -7,7 +7,7 @@ import pro from '../asset/pro.jpg';
 import cinema from '../asset/cinema.png';
 import { gsap } from "gsap";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import Anim from "../Contact/Contact.js";
 
 import { IoPin } from "react-icons/io5";
