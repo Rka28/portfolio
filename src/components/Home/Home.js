@@ -33,7 +33,7 @@ import ContactUs from "../Portofilo/Portfolio.js";
 
 
 function Home() {
-	const titleRef = useRef()
+
 	const onLoad = () => {
 		gsap.timeline().fromTo("#logo",
 			{
