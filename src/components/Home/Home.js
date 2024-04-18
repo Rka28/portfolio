@@ -1,5 +1,4 @@
 import "./Home.scss";
-
 import { FaGithub } from "react-icons/fa";
 import { FaLinkedinIn } from "react-icons/fa";
 import profile from '../asset/profil.png';
