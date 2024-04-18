@@ -1,5 +1,5 @@
 import "./Home.scss";
-import { Link } from 'react-router-dom';
+
 import { FaGithub } from "react-icons/fa";
 import { FaLinkedinIn } from "react-icons/fa";
 import profile from '../asset/profil.png';
@@ -75,7 +75,7 @@ function Home() {
 				</div>
 
 				<div className="navbar">
-					<button className=" btn-6"><span><a href="#">Home</a></span></button>
+					<button className=" btn-6"><span><a href="#home">Home</a></span></button>
 					<button className=" btn-6"><span><a href="#Portfolio">Portfolio</a></span></button>
 					<button className=" btn-6"><span><a href="#Contact">Contact</a></span></button>
 					<button className=" btn-6"><span><a href="#About">About</a></span></button>
@@ -293,7 +293,7 @@ function Home() {
 				</div>
 				<div className="quick">
 					<h4>QUICK LINKS</h4>
-					<a href="#"><p id="quick">Cinema</p> </a>
+					<a href="#home"><p id="quick">Cinema</p> </a>
 					<a href="#Portfolio"><p id="quick">Portfolio</p> </a>
 					<a href="#Contact"><p id="quick">Contact</p> </a>
 					<a href="#About"><p id="quick">About</p> </a>
