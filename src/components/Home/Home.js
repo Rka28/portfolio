@@ -326,6 +326,6 @@ function Home() {
 
 
 }
-<Link style={{ cursor: 'pointer' }} to={`/Home`}></Link>
+
 
 export default Home;
