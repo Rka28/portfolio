@@ -47,9 +47,6 @@ function Home() {
 			delay: 0.7
 		}
 		)
-
-
-
 	}
 
 
