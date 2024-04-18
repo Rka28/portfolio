@@ -6,8 +6,7 @@ import profile from '../asset/profil.png';
 import pro from '../asset/pro.jpg';
 import cinema from '../asset/cinema.png';
 import { gsap } from "gsap";
-import { ScrollToPlugin } from "gsap/ScrollToPlugin";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 import { useEffect, useRef } from "react";
 import Anim from "../Contact/Contact.js";
 
@@ -50,21 +49,7 @@ function Home() {
 		)
 
 
-		// gsap.from(".sec2 #ic ",{
-		// 	scrollTrigger :{
-		// 		trigger: ".sec2 .items-stack",
-		// 		toggleActions: "restart none none reset",
-		// 		markers :true,
 
-		// 	},
-		// 	y: 10,
-
-		// 	opacity:0,
-		// 	scale:1,
-		// 	ease: "elastic.out(0.4,0.15)",
-		// 	duration:3.20,
-		// 	stagger : 0.65,
-		// });
 	}
 
 
@@ -176,7 +161,7 @@ function Home() {
 
 
 			<div id="portfolio" className="portfolio">
-				<img className="portfolio-logo" src={cinema}></img>
+				<img className="portfolio-logo" src={cinema} alt="portfolio-logo"></img>
 				<div className="text-pro">
 
 					<h6>Spotify</h6>
@@ -191,7 +176,7 @@ function Home() {
 			</div>
 
 			<div className="portfolio2">
-				<img className="portfolio2-logo" src={cinema}></img>
+				<img className="portfolio2-logo" src={cinema} alt="portfolio2-logo"></img>
 				<div className="text-pro">
 
 					<h6>Cinema Eternel</h6>
@@ -205,7 +190,7 @@ function Home() {
 				</div>
 			</div>
 			<div id="portfolio" className="portfolio">
-				<img className="portfolio-logo" src={cinema}></img>
+				<img className="portfolio-logo" src={cinema} alt="portfolio-logo"></img>
 				<div className="text-pro">
 
 					<h6>Meetics</h6>
@@ -226,7 +211,7 @@ function Home() {
 
 			</div>
 			<div className="portfolio2">
-				<img className="portfolio2-logo" src={cinema}></img>
+				<img className="portfolio2-logo" src={cinema} alt="portfolio2-logo"></img>
 				<div className="text-pro">
 
 					<h6>League of Legend</h6>
@@ -240,7 +225,7 @@ function Home() {
 				</div>
 			</div>
 			<div className="portfolio">
-				<img className="portfolio-logo" src={cinema}></img>
+				<img className="portfolio-logo" src={cinema} alt="portfolio-logo"></img>
 				<div className="text-pro">
 
 					<h6>4M</h6>
@@ -254,7 +239,7 @@ function Home() {
 				</div>
 			</div>
 			<div className="portfolio2">
-				<img className="portfolio2-logo" src={cinema}></img>
+				<img className="portfolio2-logo" src={cinema} alt="portfolio2-logo"></img>
 				<div className="text-pro">
 
 					<h6>Crypto</h6>
