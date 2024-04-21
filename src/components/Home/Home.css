@@ -263,6 +263,12 @@ a {
     transform: rotate(360deg);
   }
 }
+video{
+  z-index: 5;
+  position: relative;
+  left: 5vw;
+  
+}
 .btn-stack1 {
   text-decoration: none;
   border: none;
