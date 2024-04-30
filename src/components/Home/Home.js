@@ -216,11 +216,11 @@ function Home() {
                 <div className="projets">
                     <h4>Projet</h4>
                     <div id="projet">
-                        <p>Cinema</p>
-                        <p>Cinema</p>
-                        <p>Cinema</p>
-                        <p>Cinema</p>
-                        <p>Cinema</p>
+                        <p>Spotify</p>
+                        <p>Cinema Eternel</p>
+                        <p>Meetics</p>
+                        <p>LOL</p>
+                        <p>4M</p>
                     </div>
                 </div>
                 <div className="quick">

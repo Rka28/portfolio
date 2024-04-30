@@ -676,7 +676,7 @@ a {
 	}
 }
 
-@media (min-width: 320px) and (max-width:768px) {
+@media (min-width: 320px) and (max-width:520px) {
 
 	.quick {
 		margin-right: 200px;
@@ -762,6 +762,7 @@ img.logo-profil{
 	}
 
 	.about {
+		display: block;
 		margin-top: 20px;
 		width: 313px;
 		height: 55vw;
@@ -770,6 +771,12 @@ img.logo-profil{
 		scrollbar-color: rgb(0, 115, 255)grey;
 		scrollbar-width: thin;
 
+	}
+	img.about-logo{
+		width: 123px;
+		display: flex;
+		margin-left: 25vw;
+	
 	}
 
 	.about p {
@@ -789,6 +796,7 @@ img.logo-profil{
 
 	.about {
 		margin-left: 0px;
+		
 	}
 
 	.projet {
@@ -881,8 +889,12 @@ img.logo-profil{
 	}
 }
 
-@media (min-width: 768px) and (max-width:1363px) {
-
+@media (min-width: 769px) and (max-width:1363px) {
+	img.about-logo{
+		max-width: 400px;
+		
+		
+	}
 	.items-stack {
 		margin-right: 0px;
 
@@ -899,6 +911,7 @@ img.logo-profil{
 		overflow-y: scroll;
 		scrollbar-color: rgb(0, 115, 255)grey;
 		scrollbar-width: thin;
+
 
 	}
 
