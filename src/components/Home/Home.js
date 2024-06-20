@@ -183,7 +183,7 @@ function Home() {
                 </div>
             </div>
 
-            <div className="portfolio">
+            {/* <div className="portfolio">
                 <img className="portfolio-logo" src={quattreM} alt="portfolio-logo" />
                 <div className="text-pro">
                     <h6>4M</h6>
@@ -194,7 +194,7 @@ function Home() {
                         <a href="https://main--4-wm.netlify.app/"><h4><CiShare1 size={40} />Live Demo</h4></a>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             <div className="projet">
                 <section id="Contact">
