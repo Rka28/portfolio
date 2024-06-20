@@ -26,7 +26,7 @@ import profile from '../asset/profil.png';
 import pro from '../asset/pro.jpg';
 import cinema from '../asset/cinema.png';
 import meetics from '../asset/meetics.png';
-import quattreM from '../asset/4M.png';
+// import quattreM from '../asset/4M.png';
 import Spotify from '../asset/Spotify.png';
 import LOL from '../asset/lol.jpg';
 import cv from '../asset/cv-Karim-Bara.pdf';
