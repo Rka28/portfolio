@@ -1,0 +1,76 @@
+/* Custom cursor styles */
+
+:root {
+  cursor: none;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+.cursor-dot,
+.cursor-dot-outline {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out, width 0.3s ease, height 0.3s ease;
+  z-index: 9999;
+}
+
+.cursor-dot {
+  width: 10px;
+  height: 10px;
+  background-color: white;
+  border-radius: 2px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+.cursor-dot-outline {
+  width: 40px;
+  height: 40px;
+  background-color: transparent;
+  border: 2px solid white;
+  border-radius: 50%;
+  mix-blend-mode: difference;
+}
+
+/* Add hover effect for interactive elements */
+a:hover ~ .cursor-dot,
+button:hover ~ .cursor-dot,
+input:hover ~ .cursor-dot,
+.interactive:hover ~ .cursor-dot {
+  transform: translate(-50%, -50%) rotate(135deg) scale(1.5);
+}
+
+a:hover ~ .cursor-dot-outline,
+button:hover ~ .cursor-dot-outline,
+input:hover ~ .cursor-dot-outline,
+.interactive:hover ~ .cursor-dot-outline {
+  transform: translate(-50%, -50%) scale(1.5);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Add this to your JavaScript to make the custom cursor work */
+/* 
+document.addEventListener('DOMContentLoaded', function() {
+  const cursorDot = document.createElement('div');
+  const cursorOutline = document.createElement('div');
+  
+  cursorDot.classList.add('cursor-dot');
+  cursorOutline.classList.add('cursor-dot-outline');
+  
+  document.body.appendChild(cursorDot);
+  document.body.appendChild(cursorOutline);
+  
+  document.addEventListener('mousemove', function(e) {
+    cursorDot.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+    cursorOutline.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+  });
+});
+*/
