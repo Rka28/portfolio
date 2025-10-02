@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import VC from '../Asset/4M.png'
 import LOL from '../Asset/LOL.png'
-import LSLs from '../Asset/LSL.png'
 import Snap from '../Asset/Snap.png'
 import LSL from '../Asset/lsl.png'
 import CommentModal from './CommentModal';

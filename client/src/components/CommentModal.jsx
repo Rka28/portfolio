@@ -18,10 +18,8 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const [selectedComment, setSelectedComment] = useState(null);
-  const [replyText, setReplyText] = useState('');
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const commentRegex = /\S+/;
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  const [ setReplyText] = useState('');
+
 
 
 

@@ -6,7 +6,7 @@ import Portfolio from './Pages/Portfolio';
 import Galerie from './Pages/Galerie';
 import Cube from './Pages/Cube';
 import Contact from './Pages/Contact';
-import { LanguageProvider, useLanguage } from './context/LanguageContext';
+import { LanguageProvider } from './context/LanguageContext';
 import LanguageSelector from './components/LanguageSelector';
 import './cursor.css'; // Will create this file later for custom cursor
 

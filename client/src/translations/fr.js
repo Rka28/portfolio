@@ -1,5 +1,5 @@
 // French translations
-export default {
+const fr = {
   common: {
     languageSelector: 'Sélectionnez votre langue',
     english: 'Anglais',
@@ -59,3 +59,5 @@ export default {
     technologies: 'Technologies'
   }
 };
+
+export default fr;
