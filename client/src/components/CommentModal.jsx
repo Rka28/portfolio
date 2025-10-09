@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
+// 🌐 Configuration dynamique de ton API backend
+// En local → http://localhost:8000/api
+// En production → ton backend Render
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  'https://portfolio-back-jcyp.onrender.com/api';
+
 const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -18,21 +25,16 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const [selectedComment, setSelectedComment] = useState(null);
-  const [ setReplyText] = useState('');
-
-
-
-
+  const [replyText, setReplyText] = useState('');
   const [showReplies, setShowReplies] = useState({});
   const [replies, setReplies] = useState({});
 
+  // 🔄 Charger les commentaires à l'ouverture
   useEffect(() => {
-    if (isOpen && projectId) {
-      fetchComments();
-    }
+    if (isOpen && projectId) fetchComments();
   }, [isOpen, projectId]);
 
-  // Check if user is already logged in from localStorage when component mounts
+  // 🔐 Vérifie si l'utilisateur est déjà connecté
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -40,39 +42,28 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
         setIsLoggedIn(true);
-      } catch (error) {
+      } catch {
         localStorage.removeItem('user');
       }
     }
   }, []);
 
+  /* ==============================
+     🧾 FONCTIONS API
+  ===============================*/
+
   const fetchComments = async () => {
     try {
       setError('');
-      const response = await fetch(`http://localhost:8000/api/comments/${projectId}`);
-      
-      if (!response.ok) {
-        throw new Error(`Server responded with status: ${response.status}`);
-      }
-      
-      // Check if response is JSON before parsing
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Le serveur a renvoyé une réponse non-JSON. Il se peut que le serveur API ne soit pas en cours d’exécution.');
-      }
-      
+      const response = await fetch(`${API_URL}/comments/${projectId}`);
+
+      if (!response.ok) throw new Error(`Erreur serveur : ${response.status}`);
+
       const data = await response.json();
-      if (data.success) {
-        setComments(data.comments);
-      } else {
-        setError(data.message || 'Failed to load comments');
-      }
-    } catch (error) {
-      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('non-JSON response')) {
-        setError('Impossible de se connecter au serveur de commentaires. Veuillez vous assurer que le serveur est en cours d’exécution, puis réessayez.');
-      } else {
-        setError('Error loading comments: ' + error.message);
-      }
+      if (data.success) setComments(data.comments);
+      else setError(data.message || 'Impossible de charger les commentaires.');
+    } catch (err) {
+      setError('❌ Serveur inaccessible. Vérifie que l’API fonctionne.');
       setComments([]);
     }
   };
@@ -80,33 +71,21 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
   const fetchReplies = async (commentId) => {
     try {
       setError('');
-      const response = await fetch(`http://localhost:8000/api/comments/replies/${commentId}`);
-      
-      if (!response.ok) {
-        throw new Error(`Le serveur a répondu avec le statut : ${response.status}`);
-      }
-      
-      // Check if response is JSON before parsing
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Server returned non-JSON response. The API server may not be running.');
-      }
-      
+      const response = await fetch(`${API_URL}/comments/replies/${commentId}`);
+
+      if (!response.ok) throw new Error(`Erreur serveur : ${response.status}`);
+
       const data = await response.json();
       if (data.success) {
-        setReplies(prev => ({
+        setReplies((prev) => ({
           ...prev,
-          [commentId]: data.replies
+          [commentId]: data.replies,
         }));
       } else {
-        setError(data.message || 'Failed to load replies');
+        setError(data.message || 'Impossible de charger les réponses.');
       }
-    } catch (error) {
-      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('non-JSON response')) {
-        setError('Impossible de se connecter au serveur de commentaires. Veuillez vous assurer que le serveur est en cours d’exécution et réessayez.');
-      } else {
-        setError('Error loading replies: ' + error.message);
-      }
+    } catch {
+      setError('❌ Impossible de contacter le serveur.');
     }
   };
 
@@ -117,49 +96,33 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
     setSuccess('');
 
     try {
-      const response = await fetch('http://localhost:8000/api/comments', {
+      const response = await fetch(`${API_URL}/comments`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           projectId,
           name: isLoggedIn ? user.name : name,
           email: isLoggedIn ? user.email : email,
           comment,
-          parentId: selectedComment ? selectedComment.id : null
+          parentId: selectedComment ? selectedComment.id : null,
         }),
       });
-
-      if (!response.ok) {
-        throw new Error(`Server responded with status: ${response.status}`);
-      }
-
-      // Check if response is JSON before parsing
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Server returned non-JSON response. The API server may not be running.');
-      }
 
       const data = await response.json();
 
       if (data.success) {
-        setSuccess('Commentaire ajouté avec succès!');
+        setSuccess('✅ Commentaire ajouté avec succès !');
         setComment('');
         if (!isLoggedIn) {
           setName('');
           setEmail('');
         }
         fetchComments();
-        if (selectedComment) {
-          setSelectedComment(null);
-          fetchReplies(selectedComment.id);
-        }
       } else {
-        setError(data.message || 'Erreur lors de l\'ajout du commentaire');
+        setError(data.message || 'Erreur lors de l’ajout du commentaire.');
       }
-    } catch (error) {
-      setError('Impossible de se connecter au serveur de commentaires. Veuillez vérifier que le serveur est en cours d\'exécution et réessayer plus tard.');
+    } catch {
+      setError('❌ Impossible de contacter le serveur.');
     } finally {
       setIsSubmitting(false);
     }
@@ -171,112 +134,78 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8000/api/auth/login', {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: loginEmail,
-          password: loginPassword,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
       });
-
-      if (!response.ok) {
-        throw new Error(`Server responded with status: ${response.status}`);
-      }
-
-      // Check if response is JSON before parsing
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Server returned non-JSON response. The API server may not be running.');
-      }
 
       const data = await response.json();
 
       if (data.success) {
-        setIsLoggedIn(true);
         setUser(data.user);
+        setIsLoggedIn(true);
         setShowLogin(false);
-        setLoginEmail('');
-        setLoginPassword('');
         localStorage.setItem('user', JSON.stringify(data.user));
       } else {
-        setError(data.message || 'Identifiants invalides');
+        setError(data.message || 'Identifiants invalides.');
       }
-    } catch (error) {
-      setError('Impossible de se connecter au serveur d\'authentification. Veuillez vérifier que le serveur est en cours d\'exécution et réessayer plus tard.');
+    } catch {
+      setError('❌ Impossible de contacter le serveur d’authentification.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError('');
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
-    const handleRegister = async (e) => {
-      e.preventDefault();
-      setIsSubmitting(true);
-      setError('');
-    
-      // 🔹 Regexes
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
-    
-      // 🔹 Validation AVANT l'appel API
-      if (!emailRegex.test(registerEmail)) {
-        setError("Veuillez entrer une adresse email valide.");
-        setIsSubmitting(false);
-        return;
+    if (!emailRegex.test(registerEmail)) {
+      setError('❌ Email invalide.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!passwordRegex.test(registerPassword)) {
+      setError(
+        '❌ Le mot de passe doit contenir au moins 8 caractères, une lettre et un chiffre.'
+      );
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: registerName,
+          email: registerEmail,
+          password: registerPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSuccess('✅ Inscription réussie ! Vous pouvez maintenant vous connecter.');
+        setShowRegister(false);
+        setShowLogin(true);
+      } else {
+        setError(data.message || 'Erreur lors de l’inscription.');
       }
-    
-      if (!passwordRegex.test(registerPassword)) {
-        setError("Le mot de passe doit contenir au moins 8 caractères, dont une lettre et un chiffre.");
-        setIsSubmitting(false);
-        return;
-      }
-    
-      try {
-        const response = await fetch('http://localhost:8000/api/auth/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name: registerName,
-            email: registerEmail,
-            password: registerPassword,
-          }),
-        });
-    
-        if (!response.ok) {
-          throw new Error(`Server responded with status: ${response.status}`);
-        }
-    
-        // Vérification que c’est bien du JSON
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          throw new Error('Server returned non-JSON response. The API server may not be running.');
-        }
-    
-        const data = await response.json();
-    
-        if (data.success) {
-          setSuccess('Inscription réussie! Vous pouvez maintenant vous connecter.');
-          setShowRegister(false);
-          setShowLogin(true);
-          setRegisterName('');
-          setRegisterEmail('');
-          setRegisterPassword('');
-        } else {
-          setError(data.message || 'Erreur lors de l\'inscription');
-        }
-      } catch (error) {
-        setError("Impossible de se connecter au serveur d'inscription. Veuillez vérifier que le serveur est en cours d'exécution et réessayer plus tard.");
-      } finally {
-        setIsSubmitting(false);
-      }
-    };
-    
+    } catch {
+      setError('❌ Serveur d’inscription inaccessible.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUser(null);
@@ -284,12 +213,10 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
   };
 
   const toggleReplies = (commentId) => {
-    if (!showReplies[commentId]) {
-      fetchReplies(commentId);
-    }
-    setShowReplies(prev => ({
+    if (!showReplies[commentId]) fetchReplies(commentId);
+    setShowReplies((prev) => ({
       ...prev,
-      [commentId]: !prev[commentId]
+      [commentId]: !prev[commentId],
     }));
   };
 
@@ -301,6 +228,8 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
   };
 
   if (!isOpen) return null;
+
+  
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
