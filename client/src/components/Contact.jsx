@@ -4,6 +4,13 @@ import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaLinkedin, FaGithub, FaTwitter, F
 import emailjs from '@emailjs/browser';
 import ReCAPTCHA from 'react-google-recaptcha';
 
+// 🌐 URL dynamique de ton API backend
+// En local → http://localhost:8000/api
+// En production → Render ou OVH
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  'https://portfolio-back-jcyp.onrender.com/api';
+
 export const Contact = () => {
   const { t } = useLanguage();
   const recaptchaRef = useRef(null);
@@ -24,6 +31,7 @@ export const Contact = () => {
     }
   }, [status.submitted]);
 
+  // 🧩 Validation du formulaire
   const validateForm = () => {
     let isValid = true;
     let errors = {};
@@ -56,18 +64,17 @@ export const Contact = () => {
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-
     if (formErrors[e.target.name]) {
       setFormErrors(prev => ({ ...prev, [e.target.name]: '' }));
     }
   };
 
+  // 📩 Envoi du formulaire de contact
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
 
-    const recaptchaToken = recaptchaRef.current.getValue();
+    const recaptchaToken = recaptchaRef.current?.getValue();
     if (!recaptchaToken) {
       setStatus({ submitted: true, success: false, message: t('common.contact.recaptchaRequired') });
       return;
@@ -76,25 +83,20 @@ export const Contact = () => {
     setLoading(true);
 
     try {
-      // Store contact form submission in database
-      const contactResponse = await fetch('http://localhost:8000/api/contact', {
+      // 🔹 1️⃣ Envoie au backend Render
+      const contactResponse = await fetch(`${API_URL}/contact`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          message: formData.message
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
       });
-      
+
       const contactData = await contactResponse.json();
+
       if (!contactData.success) {
         throw new Error(contactData.message || 'Failed to submit contact form');
       }
-      
-      // Send email notification
+
+      // 🔹 2️⃣ Envoie un email via EmailJS (notification)
       const templateParams = {
         from_name: formData.name,
         reply_to: formData.email,
@@ -102,22 +104,24 @@ export const Contact = () => {
       };
 
       await emailjs.send(
-        'service_m37mfc2', // Remplace par ton Service ID
-        'template_t8iijqo', // Remplace par ton Template ID
+        'service_m37mfc2',   // Remplace par ton Service ID
+        'template_t8iijqo',  // Remplace par ton Template ID
         templateParams,
-        'P6c9HoyBa9UVDkaTO' // Remplace par ton User ID
+        'P6c9HoyBa9UVDkaTO'  // Ton User/Public Key
       );
 
       setStatus({ submitted: true, success: true, message: t('common.contact.success') });
       setFormData({ name: '', email: '', message: '' });
       recaptchaRef.current.reset();
+
     } catch (error) {
-      console.error('Failed to process contact form:', error);
+      console.error('❌ Failed to process contact form:', error);
       setStatus({ submitted: true, success: false, message: t('common.contact.error') });
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-black text-white py-20 px-4 md:px-8">
