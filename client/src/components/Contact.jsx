@@ -3,13 +3,12 @@ import { useLanguage } from '../context/LanguageContext';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaLinkedin, FaGithub, FaTwitter, FaInstagram } from 'react-icons/fa';
 import emailjs from '@emailjs/browser';
 import ReCAPTCHA from 'react-google-recaptcha';
+import { API_URL } from '../config/api';
 
 // 🌐 URL dynamique de ton API backend
 // En local → http://localhost:8000/api
 // En production → Render ou OVH
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  'https://portfolio-back-jcyp.onrender.com/api';
+
 
 export const Contact = () => {
   const { t } = useLanguage();

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL } from '../config/api';
 
 // 🌐 Configuration dynamique de ton API backend
 // En local → http://localhost:8000/api
 // En production → ton backend Render
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  'https://portfolio-back-jcyp.onrender.com/api';
+
 
 const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
   const [name, setName] = useState('');
