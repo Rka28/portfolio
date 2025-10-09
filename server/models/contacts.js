@@ -5,10 +5,9 @@ const contactsModel = {
   // Create the contacts table if it doesn't exist
   createTable: async () => {
     try {
-      const connection = await pool.getConnection();
-      await connection.query(`
+      await pool.query(`
         CREATE TABLE IF NOT EXISTS contacts (
-          id INT AUTO_INCREMENT PRIMARY KEY,
+          id SERIAL PRIMARY KEY,
           name VARCHAR(255) NOT NULL,
           email VARCHAR(255) NOT NULL,
           message TEXT NOT NULL,
@@ -16,8 +15,7 @@ const contactsModel = {
           is_read BOOLEAN DEFAULT FALSE
         )
       `);
-      connection.release();
-      console.log('Contacts table created or already exists');
+      console.log('✅ Contacts table created or already exists');
       return true;
     } catch (error) {
       console.error('Error creating contacts table:', error);
@@ -28,13 +26,11 @@ const contactsModel = {
   // Add a new contact form submission
   addContact: async (name, email, message) => {
     try {
-      const connection = await pool.getConnection();
-      const [result] = await connection.query(
-        'INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)',
+      const result = await pool.query(
+        'INSERT INTO contacts (name, email, message) VALUES ($1, $2, $3) RETURNING *',
         [name, email, message]
       );
-      connection.release();
-      return { success: true, id: result.insertId };
+      return { success: true, id: result.rows[0].id, contact: result.rows[0] };
     } catch (error) {
       console.error('Error adding contact:', error);
       return { success: false, error: error.message };
@@ -44,12 +40,10 @@ const contactsModel = {
   // Get all contact form submissions
   getAll: async () => {
     try {
-      const connection = await pool.getConnection();
-      const [rows] = await connection.query(
+      const result = await pool.query(
         'SELECT * FROM contacts ORDER BY created_at DESC'
       );
-      connection.release();
-      return { success: true, contacts: rows };
+      return { success: true, contacts: result.rows };
     } catch (error) {
       console.error('Error getting contacts:', error);
       return { success: false, error: error.message };
@@ -59,13 +53,11 @@ const contactsModel = {
   // Mark a contact form submission as read
   markAsRead: async (id) => {
     try {
-      const connection = await pool.getConnection();
-      const [result] = await connection.query(
-        'UPDATE contacts SET is_read = TRUE WHERE id = ?',
+      const result = await pool.query(
+        'UPDATE contacts SET is_read = TRUE WHERE id = $1',
         [id]
       );
-      connection.release();
-      return { success: true, affected: result.affectedRows };
+      return { success: true, affected: result.rowCount };
     } catch (error) {
       console.error('Error marking contact as read:', error);
       return { success: false, error: error.message };
@@ -75,12 +67,10 @@ const contactsModel = {
   // Get unread contact form submissions count
   getUnreadCount: async () => {
     try {
-      const connection = await pool.getConnection();
-      const [rows] = await connection.query(
+      const result = await pool.query(
         'SELECT COUNT(*) as count FROM contacts WHERE is_read = FALSE'
       );
-      connection.release();
-      return { success: true, count: rows[0].count };
+      return { success: true, count: parseInt(result.rows[0].count) };
     } catch (error) {
       console.error('Error getting unread count:', error);
       return { success: false, error: error.message };
