@@ -20,10 +20,8 @@ const app = express();
    🔐 CONFIGURATION DU CORS
 --------------------------------- */
 const allowedOrigins = [
-  'https://kbara.net',
-  'http://kbara.net',
-  'https://www.kbara.net',
-  'http://www.kbara.net',
+  'https://portfolio-gmxs.onrender.com', // ✅ ton frontend Render
+  'https://www.portfolio-gmxs.onrender.com',
   'http://localhost:3000',
   'http://localhost:5173',
   'http://localhost:8080'

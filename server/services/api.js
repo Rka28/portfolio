@@ -1,9 +1,12 @@
 // 🌐 Configuration dynamique de l'URL de base de ton API backend
 // En local → http://localhost:8000/api
 // En production → ton URL Render ou ton sous-domaine OVH
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  'https://portfolio-back-jcyp.onrender.com/api'; // ✅ ton backend Render en production
+// ✅ src/config/api.js
+export const API_URL =
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL)
+    ? import.meta.env.VITE_API_URL
+    : 'https://portfolio-back-jcyp.onrender.com/api';
+
 
 // 🧠 Fonction générique pour gérer les réponses HTTP
 const handleResponse = async (response) => {
