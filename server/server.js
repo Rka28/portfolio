@@ -16,13 +16,48 @@ const commentsModel = require('./models/comments');
 // Initialize Express app
 const app = express();
 
-// Middleware
-app.use(cors());
+// Configuration CORS - IMPORTANT pour OVH
+const allowedOrigins = [
+  'https://votre-domaine.ovh',           // Votre domaine OVH
+  'http://votre-domaine.ovh',            // Version HTTP
+  'https://www.votre-domaine.ovh',       // Avec www
+  'http://www.votre-domaine.ovh',        // Avec www HTTP
+  'http://localhost:3000',               // Dev local
+  'http://localhost:5173',               // Vite dev
+  'http://localhost:8080'                // Autre port dev
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Autoriser les requêtes sans origin (comme Postman, curl, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('Blocked by CORS:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
+
+// Route de santé pour tester l'API
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    message: 'API is running',
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Test database connection
 testConnection();
-
 // Initialize database tables
 const initDatabase = async () => {
   try {
