@@ -111,6 +111,47 @@ app.post('/api/subscribe', async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error', error: error.message });
   }
 });
+/* -------------------------------
+   👤 AUTHENTIFICATION UTILISATEUR
+--------------------------------- */
+
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+      return res.status(400).json({ success: false, message: 'Name, email and password are required' });
+    }
+
+    const result = await commentsModel.registerUser(email, password, name);
+    if (result.success) {
+      res.status(201).json({ success: true, message: 'User registered successfully', id: result.id });
+    } else {
+      res.status(500).json({ success: false, message: 'Failed to register user', error: result.error });
+    }
+  } catch (error) {
+    console.error('Error in register endpoint:', error);
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: 'Email and password are required' });
+    }
+
+    const result = await commentsModel.loginUser(email, password);
+    if (result.success) {
+      res.status(200).json({ success: true, user: result.user });
+    } else {
+      res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+  } catch (error) {
+    console.error('Error in login endpoint:', error);
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
+});
 
 // Unsubscribe
 app.post('/api/unsubscribe', async (req, res) => {
