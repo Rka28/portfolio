@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaEnvelope, FaPaperPlane } from 'react-icons/fa';
-import { API_ENDPOINTS } from '../config/api'; // ✅ Import
+import { API_ENDPOINTS } from '../config/api.js'; // ✅ Import
 
 const Newsletter = () => {
   const [email, setEmail] = useState('');
