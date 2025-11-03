@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaEnvelope, FaPaperPlane } from 'react-icons/fa';
-import { API_ENDPOINTS } from '../config/api.js'; // ✅ Import
+import { getApiUrl } from '../utils/api';
 
 const Newsletter = () => {
   const [email, setEmail] = useState('');
@@ -19,7 +19,6 @@ const Newsletter = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Validation de l'adresse e-mail
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setStatus({
@@ -32,8 +31,7 @@ const Newsletter = () => {
     }
 
     try {
-      // ✅ Utilisation de l'endpoint configuré
-      const response = await fetch(API_ENDPOINTS.subscribe, {
+      const response = await fetch(`${getApiUrl()}/api/subscribe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

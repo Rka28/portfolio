@@ -3,11 +3,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaLinkedin, FaGithub, FaTwitter, FaInstagram } from 'react-icons/fa';
 import emailjs from '@emailjs/browser';
 import ReCAPTCHA from 'react-google-recaptcha';
-import { API_ENDPOINTS } from '../config/api';
-// 🌐 URL dynamique de ton API backend
-// En local → http://localhost:8000/api
-// En production → Render ou OVH
-
+import { getApiUrl } from '../utils/api';
 
 export const Contact = () => {
   const { t } = useLanguage();
@@ -81,8 +77,8 @@ export const Contact = () => {
     setLoading(true);
 
     try {
-      // 🔹 1️⃣ Envoie au backend Render
-      const contactResponse = await fetch(API_ENDPOINTS.contact, {
+      // 🔹 1️⃣ Envoie au backend
+      const contactResponse = await fetch(`${getApiUrl()}/api/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -102,10 +98,10 @@ export const Contact = () => {
       };
 
       await emailjs.send(
-        'service_m37mfc2',   // Remplace par ton Service ID
-        'template_t8iijqo',  // Remplace par ton Template ID
+        'service_m37mfc2',
+        'template_t8iijqo',
         templateParams,
-        'P6c9HoyBa9UVDkaTO'  // Ton User/Public Key
+        'P6c9HoyBa9UVDkaTO'
       );
 
       setStatus({ submitted: true, success: true, message: t('common.contact.success') });
@@ -119,7 +115,6 @@ export const Contact = () => {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-black text-white py-20 px-4 md:px-8">
@@ -139,9 +134,9 @@ export const Contact = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 bg-[#0A0B1E] border ${formErrors.name ? 'border-red-500' : 'border-gray-700'} rounded-lg`}
+                  className={`w-full px-4 py-3 bg-[#0A0B1E] border ${formErrors.name ? 'border-red-500' : 'border-gray-700'} rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#FFB86C]`}
                 />
-                {formErrors.name && <p className="text-red-400 text-sm">{formErrors.name}</p>}
+                {formErrors.name && <p className="text-red-400 text-sm mt-1">{formErrors.name}</p>}
               </div>
 
               <div>
@@ -152,9 +147,9 @@ export const Contact = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 bg-[#0A0B1E] border ${formErrors.email ? 'border-red-500' : 'border-gray-700'} rounded-lg`}
+                  className={`w-full px-4 py-3 bg-[#0A0B1E] border ${formErrors.email ? 'border-red-500' : 'border-gray-700'} rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#FFB86C]`}
                 />
-                {formErrors.email && <p className="text-red-400 text-sm">{formErrors.email}</p>}
+                {formErrors.email && <p className="text-red-400 text-sm mt-1">{formErrors.email}</p>}
               </div>
 
               <div>
@@ -165,19 +160,23 @@ export const Contact = () => {
                   value={formData.message}
                   onChange={handleChange}
                   rows="5"
-                  className={`w-full px-4 py-3 bg-[#0A0B1E] border ${formErrors.message ? 'border-red-500' : 'border-gray-700'} rounded-lg resize-none`}
+                  className={`w-full px-4 py-3 bg-[#0A0B1E] border ${formErrors.message ? 'border-red-500' : 'border-gray-700'} rounded-lg resize-none text-white focus:outline-none focus:ring-2 focus:ring-[#FFB86C]`}
                 ></textarea>
-                {formErrors.message && <p className="text-red-400 text-sm">{formErrors.message}</p>}
+                {formErrors.message && <p className="text-red-400 text-sm mt-1">{formErrors.message}</p>}
               </div>
 
               <ReCAPTCHA ref={recaptchaRef} sitekey="6LdfIMEqAAAAAM9n3D9Q_izB3_-s7k6W4UBW-C3Y" />
 
-              <button type="submit" disabled={loading} className="w-full py-3 bg-gradient-to-r from-[#FFB86C] to-[#FF6B6B] text-black font-medium rounded-lg hover:opacity-90 disabled:opacity-50">
-                {loading ? '...' : t('common.contact.send')}
+              <button 
+                type="submit" 
+                disabled={loading} 
+                className="w-full py-3 bg-gradient-to-r from-[#FFB86C] to-[#FF6B6B] text-black font-medium rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Envoi en cours...' : t('common.contact.send')}
               </button>
 
               {status.submitted && (
-                <div className={`mt-4 p-3 rounded-lg ${status.success ? 'bg-green-900/30 text-green-300' : 'bg-red-900/30 text-red-300'}`}>
+                <div className={`mt-4 p-3 rounded-lg text-center ${status.success ? 'bg-green-900/30 text-green-300' : 'bg-red-900/30 text-red-300'}`}>
                   {status.message}
                 </div>
               )}

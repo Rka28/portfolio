@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { API_ENDPOINTS } from '../config/api';
+import { getApiUrl } from '../utils/api';
 
 const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
   const [name, setName] = useState('');
@@ -49,7 +49,7 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
   const fetchComments = async () => {
     try {
       setError('');
-      const response = await fetch(API_ENDPOINTS.comments(projectId));
+      const response = await fetch(`${getApiUrl()}/api/comments/${projectId}`);
 
       if (!response.ok) throw new Error(`Erreur serveur : ${response.status}`);
 
@@ -65,13 +65,7 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
   const fetchReplies = async (commentId) => {
     try {
       setError('');
-      // Note: Cette route n'existe pas dans votre serveur actuel
-      // Vous devrez peut-être l'ajouter ou utiliser la route existante
-      const apiUrl = process.env.NODE_ENV === 'production' 
-        ? `/api/comments/replies/${commentId}`
-        : `http://localhost:8000/api/comments/replies/${commentId}`;
-      
-      const response = await fetch(apiUrl);
+      const response = await fetch(`${getApiUrl()}/api/comments/replies/${commentId}`);
 
       if (!response.ok) throw new Error(`Erreur serveur : ${response.status}`);
 
@@ -96,7 +90,7 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
     setSuccess('');
 
     try {
-      const response = await fetch(API_ENDPOINTS.addComment, {
+      const response = await fetch(`${getApiUrl()}/api/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -135,7 +129,7 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
     setError('');
 
     try {
-      const response = await fetch(API_ENDPOINTS.login, {
+      const response = await fetch(`${getApiUrl()}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: loginEmail, password: loginPassword }),
@@ -182,7 +176,7 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
     }
 
     try {
-      const response = await fetch(API_ENDPOINTS.register, {
+      const response = await fetch(`${getApiUrl()}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
