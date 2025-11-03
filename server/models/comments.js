@@ -1,62 +1,39 @@
-const { supabase  } = require('../config/db');
+const { supabase } = require('../config/db');
 const bcrypt = require('bcrypt');
-const SALT_ROUNDS = 10; // Number of salt rounds for bcrypt
+const SALT_ROUNDS = 10;
 
-// Comments model for project comments
 const commentsModel = {
-  // Create the comments table if it doesn't exist
+  // Create tables via Supabase Dashboard SQL Editor
   createTable: async () => {
-    try {
-      await supabase.query(`
-        CREATE TABLE IF NOT EXISTS comments (
-          id SERIAL PRIMARY KEY,
-          project_id VARCHAR(10) NOT NULL,
-          name VARCHAR(255) NOT NULL,
-          email VARCHAR(255) NOT NULL,
-          comment TEXT NOT NULL,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          is_read BOOLEAN DEFAULT FALSE,
-          parent_id INTEGER NULL,
-          FOREIGN KEY (parent_id) REFERENCES comments(id) ON DELETE CASCADE
-        )
-      `);
-      console.log('✅ Comments table created or already exists');
-      return true;
-    } catch (error) {
-      console.error('Error creating comments table:', error);
-      return false;
-    }
+    console.log('✅ Comments table managed via Supabase Dashboard');
+    return true;
   },
 
-  // Create the users table if it doesn't exist
   createUsersTable: async () => {
-    try {
-      await supabase.query(`
-        CREATE TABLE IF NOT EXISTS users (
-          id SERIAL PRIMARY KEY,
-          email VARCHAR(255) NOT NULL UNIQUE,
-          password VARCHAR(255) NOT NULL,
-          name VARCHAR(255) NOT NULL,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          last_login TIMESTAMP NULL
-        )
-      `);
-      console.log('✅ Users table created or already exists');
-      return true;
-    } catch (error) {
-      console.error('Error creating users table:', error);
-      return false;
-    }
+    console.log('✅ Users table managed via Supabase Dashboard');
+    return true;
   },
 
   // Add a new comment
   addComment: async (projectId, name, email, comment, parentId = null) => {
     try {
-      const result = await pool.query(
-        'INSERT INTO comments (project_id, name, email, comment, parent_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-        [projectId, name, email, comment, parentId]
-      );
-      return { success: true, id: result.rows[0].id, comment: result.rows[0] };
+      const { data, error } = await supabase
+        .from('comments')
+        .insert([
+          {
+            project_id: projectId,
+            name,
+            email,
+            comment,
+            parent_id: parentId,
+            created_at: new Date().toISOString()
+          }
+        ])
+        .select();
+
+      if (error) throw error;
+
+      return { success: true, id: data[0].id, comment: data[0] };
     } catch (error) {
       console.error('Error adding comment:', error);
       return { success: false, error: error.message };
@@ -66,15 +43,16 @@ const commentsModel = {
   // Get all comments for a project
   getCommentsByProject: async (projectId) => {
     try {
-      const result = await pool.query(
-        `SELECT c.*, 
-          (SELECT COUNT(*) FROM comments WHERE parent_id = c.id) as reply_count 
-         FROM comments c 
-         WHERE c.project_id = $1 AND c.parent_id IS NULL 
-         ORDER BY c.created_at DESC`,
-        [projectId]
-      );
-      return { success: true, comments: result.rows };
+      const { data, error } = await supabase
+        .from('comments')
+        .select('*')
+        .eq('project_id', projectId)
+        .is('parent_id', null)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return { success: true, comments: data };
     } catch (error) {
       console.error('Error getting comments:', error);
       return { success: false, error: error.message };
@@ -84,11 +62,15 @@ const commentsModel = {
   // Get replies for a comment
   getReplies: async (commentId) => {
     try {
-      const result = await pool.query(
-        'SELECT * FROM comments WHERE parent_id = $1 ORDER BY created_at ASC',
-        [commentId]
-      );
-      return { success: true, replies: result.rows };
+      const { data, error } = await supabase
+        .from('comments')
+        .select('*')
+        .eq('parent_id', commentId)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      return { success: true, replies: data };
     } catch (error) {
       console.error('Error getting replies:', error);
       return { success: false, error: error.message };
@@ -98,15 +80,15 @@ const commentsModel = {
   // Get comments by user email
   getCommentsByUser: async (email) => {
     try {
-      const result = await pool.query(
-        `SELECT c.*, 
-          (SELECT COUNT(*) FROM comments WHERE parent_id = c.id) as reply_count 
-         FROM comments c 
-         WHERE c.email = $1 
-         ORDER BY c.created_at DESC`,
-        [email]
-      );
-      return { success: true, comments: result.rows };
+      const { data, error } = await supabase
+        .from('comments')
+        .select('*')
+        .eq('email', email)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return { success: true, comments: data };
     } catch (error) {
       console.error('Error getting user comments:', error);
       return { success: false, error: error.message };
@@ -116,19 +98,29 @@ const commentsModel = {
   // Register a new user
   registerUser: async (email, password, name) => {
     try {
-      // Hash the password before storing it
       const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
       
-      const result = await pool.query(
-        'INSERT INTO users (email, password, name) VALUES ($1, $2, $3) RETURNING id, email, name',
-        [email, hashedPassword, name]
-      );
-      return { success: true, id: result.rows[0].id, user: result.rows[0] };
-    } catch (error) {
-      // PostgreSQL error code for unique violation
-      if (error.code === '23505') {
-        return { success: false, error: 'Email already registered' };
+      const { data, error } = await supabase
+        .from('users')
+        .insert([
+          {
+            email,
+            password: hashedPassword,
+            name,
+            created_at: new Date().toISOString()
+          }
+        ])
+        .select('id, email, name');
+
+      if (error) {
+        if (error.code === '23505') {
+          return { success: false, error: 'Email already registered' };
+        }
+        throw error;
       }
+
+      return { success: true, id: data[0].id, user: data[0] };
+    } catch (error) {
       console.error('Error registering user:', error);
       return { success: false, error: error.message };
     }
@@ -137,36 +129,36 @@ const commentsModel = {
   // Login user
   loginUser: async (email, password) => {
     try {
-      // First, get the user by email to retrieve the hashed password
-      const result = await pool.query(
-        'SELECT id, email, name, password FROM users WHERE email = $1',
-        [email]
-      );
-      
-      let success = false;
-      let user = null;
-      
-      // If user exists, compare the provided password with the stored hash
-      if (result.rows.length > 0) {
-        const match = await bcrypt.compare(password, result.rows[0].password);
-        
-        if (match) {
-          success = true;
-          user = {
-            id: result.rows[0].id,
-            email: result.rows[0].email,
-            name: result.rows[0].name
-          };
-          
-          // Update last login timestamp
-          await supabase.query(
-            'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
-            [result.rows[0].id]
-          );
-        }
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, email, name, password')
+        .eq('email', email)
+        .single();
+
+      if (error || !data) {
+        return { success: false, user: null };
       }
+
+      const match = await bcrypt.compare(password, data.password);
       
-      return { success, user };
+      if (match) {
+        // Update last login
+        await supabase
+          .from('users')
+          .update({ last_login: new Date().toISOString() })
+          .eq('id', data.id);
+
+        return {
+          success: true,
+          user: {
+            id: data.id,
+            email: data.email,
+            name: data.name
+          }
+        };
+      }
+
+      return { success: false, user: null };
     } catch (error) {
       console.error('Error logging in user:', error);
       return { success: false, error: error.message };

@@ -1,53 +1,66 @@
 const { supabase } = require('../config/db');
 
-// Subscribers model for newsletter subscriptions
 const subscribersModel = {
-  // Create the subscribers table if it doesn't exist
   createTable: async () => {
-    try {
-      await supabase.query(`
-        CREATE TABLE IF NOT EXISTS subscribers (
-          id SERIAL PRIMARY KEY,
-          email VARCHAR(255) NOT NULL UNIQUE,
-          subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          is_active BOOLEAN DEFAULT TRUE,
-          last_email_sent TIMESTAMP NULL
-        )
-      `);
-      console.log('✅ Subscribers table created or already exists');
-      return true;
-    } catch (error) {
-      console.error('Error creating subscribers table:', error);
-      return false;
-    }
+    console.log('✅ Subscribers table managed via Supabase Dashboard');
+    return true;
   },
 
   // Add a new subscriber
   addSubscriber: async (email) => {
     try {
-      const result = await supabase.query(
-        `INSERT INTO subscribers (email) 
-         VALUES ($1) 
-         ON CONFLICT (email) 
-         DO UPDATE SET is_active = TRUE
-         RETURNING *`,
-        [email]
-      );
-      return { success: true, id: result.rows[0].id, subscriber: result.rows[0] };
+      // Vérifier si l'email existe déjà
+      const { data: existing, error: checkError } = await supabase
+        .from('subscribers')
+        .select('*')
+        .eq('email', email)
+        .single();
+
+      // Si l'email existe, réactiver l'abonnement
+      if (existing) {
+        const { data, error } = await supabase
+          .from('subscribers')
+          .update({ is_active: true })
+          .eq('email', email)
+          .select();
+
+        if (error) throw error;
+        return { success: true, id: data[0].id, subscriber: data[0] };
+      }
+
+      // Sinon, créer un nouveau subscriber
+      const { data, error } = await supabase
+        .from('subscribers')
+        .insert([
+          {
+            email,
+            subscribed_at: new Date().toISOString(),
+            is_active: true
+          }
+        ])
+        .select();
+
+      if (error) throw error;
+
+      return { success: true, id: data[0].id, subscriber: data[0] };
     } catch (error) {
       console.error('Error adding subscriber:', error);
       return { success: false, error: error.message };
     }
   },
 
-  // Unsubscribe a subscriber (set is_active to false)
+  // Unsubscribe a subscriber
   unsubscribe: async (email) => {
     try {
-      const result = await supabase.query(
-        'UPDATE subscribers SET is_active = FALSE WHERE email = $1',
-        [email]
-      );
-      return { success: true, affected: result.rowCount };
+      const { data, error } = await supabase
+        .from('subscribers')
+        .update({ is_active: false })
+        .eq('email', email)
+        .select();
+
+      if (error) throw error;
+
+      return { success: true, affected: data.length };
     } catch (error) {
       console.error('Error unsubscribing:', error);
       return { success: false, error: error.message };
@@ -57,24 +70,33 @@ const subscribersModel = {
   // Get all active subscribers
   getAllActive: async () => {
     try {
-      const result = await supabase.query(
-        'SELECT * FROM subscribers WHERE is_active = TRUE ORDER BY subscribed_at DESC'
-      );
-      return { success: true, subscribers: result.rows };
+      const { data, error } = await supabase
+        .from('subscribers')
+        .select('*')
+        .eq('is_active', true)
+        .order('subscribed_at', { ascending: false });
+
+      if (error) throw error;
+
+      return { success: true, subscribers: data };
     } catch (error) {
       console.error('Error getting subscribers:', error);
       return { success: false, error: error.message };
     }
   },
 
-  // Update last_email_sent timestamp for a subscriber
+  // Update last_email_sent timestamp
   updateLastEmailSent: async (email) => {
     try {
-      const result = await supabase.query(
-        'UPDATE subscribers SET last_email_sent = CURRENT_TIMESTAMP WHERE email = $1',
-        [email]
-      );
-      return { success: true, affected: result.rowCount };
+      const { data, error } = await supabase
+        .from('subscribers')
+        .update({ last_email_sent: new Date().toISOString() })
+        .eq('email', email)
+        .select();
+
+      if (error) throw error;
+
+      return { success: true, affected: data.length };
     } catch (error) {
       console.error('Error updating last email sent:', error);
       return { success: false, error: error.message };
