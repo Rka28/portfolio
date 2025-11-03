@@ -3,18 +3,22 @@ import VC from '../Asset/4M.png'
 import LOL from '../Asset/LOL.png'
 import Snap from '../Asset/Snap.png'
 import LSL from '../Asset/lsl.png'
+
+import Map from '../Asset/Map.png'
 import CommentModal from './CommentModal';
 const ProjectCard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const projects = [
     {
-      icon: VC,
-      title: '4M',
+
+    
+      icon: LSL,
+      title: 'SITE LE STUDIO LED',
       number: '01',
-      description: 'Application de Locations de Véhicule',
-      link: 'https://4-wm.netlify.app/',
-      size: 'lg:col-span-2 h-[600px]'
+      description: 'Création d’un site internet pour l’entreprise où j’ai effectué mon alternance.',
+      link: 'https://lestudioled.com/',
+      size: 'h-[450px]'
     },
     {
       icon: LOL,
@@ -28,32 +32,26 @@ const ProjectCard = () => {
       icon: Snap,
       title: 'SNAPCHAT',
       number: '03',
-      description: 'Application snachat',
+
+      description: 'L’application Snapchat, grâce à une API, offre la possibilité d’envoyer des messages et de prendre des photos.',
       size: 'h-[500px]'
     },
     {
-      icon: LSL,
-      title: 'LE STUDIO LED',
+      icon: Map,
+      title: 'Ledmap',
       number: '04',
-      description: 'Création d\'un site en Wordpress',
+      description: 'Création d’une carte sur leur réseau local référençant tous les clients et intégrant automatiquement leurs contacts, avec plusieurs informations associées',
       size: 'lg:col-span-2 h-[550px]'
     },
     {
-      icon: LSL,
-      title: 'SITE LE STUDIO LED',
+      icon: VC,
+      title: '4M',
       number: '05',
-      description: 'Création d’un site internet pour l’entreprise où j’ai effectué mon alternance.',
-      link: 'https://lestudioled.com/',
-      size: 'h-[450px]'
+      description: ' Application de location de véhicules permet aux utilisateurs de consulter, réserver et de gérer leurs réservations',
+      link: 'https://4-wm.netlify.app/',
+      size: 'lg:col-span-2 h-[600px]'
     },
-    {
-      icon: 'https://public.readdy.ai/ai/img_res/3d47eadde1b445c7d69914098fc4d352.jpg',
-      title: 'DATA VISUALIZER',
-      number: '06',
-      description: 'Analyse et visualisation de données',
-      link: 'https://data-visualizer.com',
-      size: 'h-[500px]'
-    }
+ 
   ];
 
   const openCommentModal = (e, project) => {
