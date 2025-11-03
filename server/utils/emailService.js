@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Email templates
+
 const emailTemplates = {
   welcome: (email) => ({
     subject: 'Welcome to Our Newsletter!',
