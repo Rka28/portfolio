@@ -2,7 +2,7 @@ node_modules
 
 server/.env
 # fichiers d’environnement
-.env
+
 .env.local
 .env.production
 .env.development
