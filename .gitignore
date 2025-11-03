@@ -1,12 +1,12 @@
-# Dépendances
+# 🧩 Dépendances
 node_modules
 
-# Fichiers d’environnement
+# 🔒 Fichiers d’environnement
 .env
 *.env
 client/.env
 server/.env
 
-# Builds
+# 🏗️ Fichiers de build
 client/build
 server/dist
