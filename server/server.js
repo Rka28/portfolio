@@ -230,6 +230,25 @@ app.get('/api/comments/:projectId', async (req, res) => {
 /* -------------------------------
    🚀 START SERVER
 --------------------------------- */
+/* -------------------------------
+   📦 SERVIR LE CLIENT EN PRODUCTION
+--------------------------------- */
+const path = require('path');
+
+if (process.env.NODE_ENV === 'production') {
+  // Servir les fichiers statiques du build React
+  app.use(express.static(path.join(__dirname, '../client/build')));
+  
+  // Pour toutes les autres routes, servir index.html (pour React Router)
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+  });
+}
+
+/* -------------------------------
+   🚀 START SERVER
+--------------------------------- */
+
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {

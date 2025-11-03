@@ -1,4 +1,4 @@
-const { pool } = require('../config/db');
+const { supabase  } = require('../config/db');
 const bcrypt = require('bcrypt');
 const SALT_ROUNDS = 10; // Number of salt rounds for bcrypt
 
@@ -7,7 +7,7 @@ const commentsModel = {
   // Create the comments table if it doesn't exist
   createTable: async () => {
     try {
-      await pool.query(`
+      await supabase.query(`
         CREATE TABLE IF NOT EXISTS comments (
           id SERIAL PRIMARY KEY,
           project_id VARCHAR(10) NOT NULL,
@@ -31,7 +31,7 @@ const commentsModel = {
   // Create the users table if it doesn't exist
   createUsersTable: async () => {
     try {
-      await pool.query(`
+      await supabase.query(`
         CREATE TABLE IF NOT EXISTS users (
           id SERIAL PRIMARY KEY,
           email VARCHAR(255) NOT NULL UNIQUE,
@@ -159,7 +159,7 @@ const commentsModel = {
           };
           
           // Update last login timestamp
-          await pool.query(
+          await supabase.query(
             'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
             [result.rows[0].id]
           );

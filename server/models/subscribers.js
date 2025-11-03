@@ -1,11 +1,11 @@
-const { pool } = require('../config/db');
+const { supabase } = require('../config/db');
 
 // Subscribers model for newsletter subscriptions
 const subscribersModel = {
   // Create the subscribers table if it doesn't exist
   createTable: async () => {
     try {
-      await pool.query(`
+      await supabase.query(`
         CREATE TABLE IF NOT EXISTS subscribers (
           id SERIAL PRIMARY KEY,
           email VARCHAR(255) NOT NULL UNIQUE,
@@ -25,7 +25,7 @@ const subscribersModel = {
   // Add a new subscriber
   addSubscriber: async (email) => {
     try {
-      const result = await pool.query(
+      const result = await supabase.query(
         `INSERT INTO subscribers (email) 
          VALUES ($1) 
          ON CONFLICT (email) 
@@ -43,7 +43,7 @@ const subscribersModel = {
   // Unsubscribe a subscriber (set is_active to false)
   unsubscribe: async (email) => {
     try {
-      const result = await pool.query(
+      const result = await supabase.query(
         'UPDATE subscribers SET is_active = FALSE WHERE email = $1',
         [email]
       );
@@ -57,7 +57,7 @@ const subscribersModel = {
   // Get all active subscribers
   getAllActive: async () => {
     try {
-      const result = await pool.query(
+      const result = await supabase.query(
         'SELECT * FROM subscribers WHERE is_active = TRUE ORDER BY subscribed_at DESC'
       );
       return { success: true, subscribers: result.rows };
@@ -70,7 +70,7 @@ const subscribersModel = {
   // Update last_email_sent timestamp for a subscriber
   updateLastEmailSent: async (email) => {
     try {
-      const result = await pool.query(
+      const result = await supabase.query(
         'UPDATE subscribers SET last_email_sent = CURRENT_TIMESTAMP WHERE email = $1',
         [email]
       );

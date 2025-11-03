@@ -1,11 +1,11 @@
-const { pool } = require('../config/db');
+const { supabase } = require('../config/db');
 
 // Contacts model for storing contact form submissions
 const contactsModel = {
   // Create the contacts table if it doesn't exist
   createTable: async () => {
     try {
-      await pool.query(`
+      await supabase.query(`
         CREATE TABLE IF NOT EXISTS contacts (
           id SERIAL PRIMARY KEY,
           name VARCHAR(255) NOT NULL,
@@ -26,7 +26,7 @@ const contactsModel = {
   // Add a new contact form submission
   addContact: async (name, email, message) => {
     try {
-      const result = await pool.query(
+      const result = await supabase.query(
         'INSERT INTO contacts (name, email, message) VALUES ($1, $2, $3) RETURNING *',
         [name, email, message]
       );
@@ -40,7 +40,7 @@ const contactsModel = {
   // Get all contact form submissions
   getAll: async () => {
     try {
-      const result = await pool.query(
+      const result = await supabase.query(
         'SELECT * FROM contacts ORDER BY created_at DESC'
       );
       return { success: true, contacts: result.rows };
@@ -53,7 +53,7 @@ const contactsModel = {
   // Mark a contact form submission as read
   markAsRead: async (id) => {
     try {
-      const result = await pool.query(
+      const result = await supabase.query(
         'UPDATE contacts SET is_read = TRUE WHERE id = $1',
         [id]
       );
@@ -67,7 +67,7 @@ const contactsModel = {
   // Get unread contact form submissions count
   getUnreadCount: async () => {
     try {
-      const result = await pool.query(
+      const result = await supabase.query(
         'SELECT COUNT(*) as count FROM contacts WHERE is_read = FALSE'
       );
       return { success: true, count: parseInt(result.rows[0].count) };
