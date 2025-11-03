@@ -1,5 +1,5 @@
-require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
+require('dotenv').config();
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -8,13 +8,16 @@ const supabase = createClient(
 
 const testConnection = async () => {
   try {
-    const { data, error } = await supabase.from('projects').select('*').limit(1);
+    const { data, error } = await supabase
+      .from('subscribers')
+      .select('count')
+      .limit(1);
+    
     if (error) throw error;
-    console.log('✅ Connecté à Supabase avec succès !');
-    return true;
-  } catch (err) {
-    console.error('❌ Erreur de connexion à Supabase :', err.message);
-    return false;
+    
+    console.log('✅ Supabase connection established successfully');
+  } catch (error) {
+    console.error('❌ Supabase connection failed:', error.message);
   }
 };
 
