@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { API_URL } from '../config/api';
-
-// 🌐 Configuration dynamique de ton API backend
-// En local → http://localhost:8000/api
-// En production → ton backend Render
-
+import { API_ENDPOINTS } from '../config/api';
 
 const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
   const [name, setName] = useState('');
@@ -54,7 +49,7 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
   const fetchComments = async () => {
     try {
       setError('');
-      const response = await fetch(`${API_URL}/comments/${projectId}`);
+      const response = await fetch(API_ENDPOINTS.comments(projectId));
 
       if (!response.ok) throw new Error(`Erreur serveur : ${response.status}`);
 
@@ -62,7 +57,7 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
       if (data.success) setComments(data.comments);
       else setError(data.message || 'Impossible de charger les commentaires.');
     } catch (err) {
-      setError('❌ Serveur inaccessible. Vérifie que l’API fonctionne.');
+      setError('❌ Serveur inaccessible. Vérifie que l\'API fonctionne.');
       setComments([]);
     }
   };
@@ -70,7 +65,13 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
   const fetchReplies = async (commentId) => {
     try {
       setError('');
-      const response = await fetch(`${API_URL}/comments/replies/${commentId}`);
+      // Note: Cette route n'existe pas dans votre serveur actuel
+      // Vous devrez peut-être l'ajouter ou utiliser la route existante
+      const apiUrl = process.env.NODE_ENV === 'production' 
+        ? `/api/comments/replies/${commentId}`
+        : `http://localhost:8000/api/comments/replies/${commentId}`;
+      
+      const response = await fetch(apiUrl);
 
       if (!response.ok) throw new Error(`Erreur serveur : ${response.status}`);
 
@@ -95,7 +96,7 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
     setSuccess('');
 
     try {
-      const response = await fetch(`${API_URL}/comments`, {
+      const response = await fetch(API_ENDPOINTS.addComment, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -116,9 +117,10 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
           setName('');
           setEmail('');
         }
+        setSelectedComment(null);
         fetchComments();
       } else {
-        setError(data.message || 'Erreur lors de l’ajout du commentaire.');
+        setError(data.message || 'Erreur lors de l\'ajout du commentaire.');
       }
     } catch {
       setError('❌ Impossible de contacter le serveur.');
@@ -133,7 +135,7 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
     setError('');
 
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
+      const response = await fetch(API_ENDPOINTS.login, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: loginEmail, password: loginPassword }),
@@ -146,11 +148,12 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
         setIsLoggedIn(true);
         setShowLogin(false);
         localStorage.setItem('user', JSON.stringify(data.user));
+        setSuccess('✅ Connexion réussie !');
       } else {
         setError(data.message || 'Identifiants invalides.');
       }
     } catch {
-      setError('❌ Impossible de contacter le serveur d’authentification.');
+      setError('❌ Impossible de contacter le serveur d\'authentification.');
     } finally {
       setIsSubmitting(false);
     }
@@ -179,7 +182,7 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/auth/register`, {
+      const response = await fetch(API_ENDPOINTS.register, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -196,10 +199,10 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
         setShowRegister(false);
         setShowLogin(true);
       } else {
-        setError(data.message || 'Erreur lors de l’inscription.');
+        setError(data.message || 'Erreur lors de l\'inscription.');
       }
     } catch {
-      setError('❌ Serveur d’inscription inaccessible.');
+      setError('❌ Serveur d\'inscription inaccessible.');
     } finally {
       setIsSubmitting(false);
     }
@@ -209,6 +212,7 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
     setIsLoggedIn(false);
     setUser(null);
     localStorage.removeItem('user');
+    setSuccess('✅ Déconnexion réussie !');
   };
 
   const toggleReplies = (commentId) => {
@@ -228,24 +232,22 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
 
   if (!isOpen) return null;
 
-  
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
       <div className="bg-[#0D0F2B] rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-      <div className="p-6 border-b border-[#FFFFFF]/20 relative">
-  <h2 className="text-2xl font-bold bg-gradient-to-r from-[#FFB86C] to-[#FF6B6B] bg-clip-text text-transparent">
-    Commentaires - {projectTitle}
-  </h2>
+        <div className="p-6 border-b border-[#FFFFFF]/20 relative">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-[#FFB86C] to-[#FF6B6B] bg-clip-text text-transparent">
+            Commentaires - {projectTitle}
+          </h2>
 
-  {/* Bouton X en haut à droite */}
-  <button
-    onClick={onClose}
-    className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors text-2xl"
-  >
-    ✕
-  </button>
-</div>
+          {/* Bouton X en haut à droite */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors text-2xl"
+          >
+            ✕
+          </button>
+        </div>
 
         <div className="p-6">
           {/* User Authentication Section */}

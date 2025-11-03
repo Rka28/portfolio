@@ -3,8 +3,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaLinkedin, FaGithub, FaTwitter, FaInstagram } from 'react-icons/fa';
 import emailjs from '@emailjs/browser';
 import ReCAPTCHA from 'react-google-recaptcha';
-import { API_URL } from '../config/api';
-
+import { API_ENDPOINTS } from '../config/api';
 // 🌐 URL dynamique de ton API backend
 // En local → http://localhost:8000/api
 // En production → Render ou OVH
@@ -83,7 +82,7 @@ export const Contact = () => {
 
     try {
       // 🔹 1️⃣ Envoie au backend Render
-      const contactResponse = await fetch(`${API_URL}/contact`, {
+      const contactResponse = await fetch(API_ENDPOINTS.contact, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
