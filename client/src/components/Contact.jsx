@@ -91,7 +91,7 @@ export const Contact = () => {
       );
 
   
-      setStatus({ submitted: true, success: true, message: "✅ Message envoyé avec succès !" });
+      setStatus({ submitted: true, success: true, message: " Message envoyé avec succès !" });
       setFormData({ name: '', email: '', message: '' });
       recaptchaRef.current.reset();
     } catch (error) {
