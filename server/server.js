@@ -16,8 +16,15 @@ const commentsModel = require('./models/comments');
 // Initialize Express app
 const app = express();
 
-// Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:5173', // pour le développement local
+    'https://portfolio-gmxs.onrender.com' // ton frontend Render
+  ],
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+}));
+
 app.use(express.json());
 
 // Test database connection
