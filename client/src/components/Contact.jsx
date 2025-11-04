@@ -98,10 +98,10 @@ export const Contact = () => {
       };
 
       await emailjs.send(
-        'service_m37mfc2',
+        'service_nf8hrp9',
         'template_t8iijqo',
         templateParams,
-        'P6c9HoyBa9UVDkaTO'
+        'dee0c_QoH_PHJ1M7E'
       );
 
       setStatus({ submitted: true, success: true, message: t('common.contact.success') });
