@@ -3,7 +3,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaLinkedin, FaGithub, FaTwitter, FaInstagram } from 'react-icons/fa';
 import emailjs from '@emailjs/browser';
 import ReCAPTCHA from 'react-google-recaptcha';
-import { getApiUrl } from '../utils/api';
+import { API_URL } from '../config/api'; // ✅ utilisation centralisée
 
 export const Contact = () => {
   const { t } = useLanguage();

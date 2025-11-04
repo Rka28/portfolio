@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaEnvelope, FaPaperPlane } from 'react-icons/fa';
-import { getApiUrl } from '../utils/api';
+import { API_URL } from '../config/api'; // ✅ utilisation centralisée
 
 const Newsletter = () => {
   const [email, setEmail] = useState('');
