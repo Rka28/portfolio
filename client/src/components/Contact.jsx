@@ -63,40 +63,26 @@ export const Contact = () => {
     }
   };
 
-  // 📩 Envoi du formulaire de contact
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-
+  
     const recaptchaToken = recaptchaRef.current?.getValue();
     if (!recaptchaToken) {
-      setStatus({ submitted: true, success: false, message: t('common.contact.recaptchaRequired') });
+      setStatus({ submitted: true, success: false, message: "Veuillez valider le reCAPTCHA." });
       return;
     }
-
+  
     setLoading(true);
-
+  
     try {
-      // 🔹 1️⃣ Envoie au backend
-      const contactResponse = await fetch(`${API_URL}/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-
-      const contactData = await contactResponse.json();
-
-      if (!contactData.success) {
-        throw new Error(contactData.message || 'Failed to submit contact form');
-      }
-
-      // 🔹 2️⃣ Envoie un email via EmailJS (notification)
       const templateParams = {
         from_name: formData.name,
         reply_to: formData.email,
-        message: formData.message
+        message: formData.message,
       };
-
+  
       await emailjs.send(
         'service_nf8hrp9',
         'template_t8iijqo',
@@ -104,18 +90,18 @@ export const Contact = () => {
         'dee0c_QoH_PHJ1M7E'
       );
 
-      setStatus({ submitted: true, success: true, message: t('common.contact.success') });
+  
+      setStatus({ submitted: true, success: true, message: "✅ Message envoyé avec succès !" });
       setFormData({ name: '', email: '', message: '' });
       recaptchaRef.current.reset();
-
     } catch (error) {
-      console.error('❌ Failed to process contact form:', error);
-      setStatus({ submitted: true, success: false, message: t('common.contact.error') });
+      console.error("❌ EmailJS error:", error);
+      setStatus({ submitted: true, success: false, message: "Erreur lors de l'envoi du message." });
     } finally {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-black text-white py-20 px-4 md:px-8">
       <div className="max-w-6xl mx-auto">
