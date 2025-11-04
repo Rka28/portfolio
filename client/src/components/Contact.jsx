@@ -78,7 +78,7 @@ export const Contact = () => {
 
     try {
       // 🔹 1️⃣ Envoie au backend
-      const contactResponse = await fetch(`${getApiUrl()}/api/contact`, {
+      const contactResponse = await fetch(`${API_URL}/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

@@ -31,7 +31,8 @@ const Newsletter = () => {
     }
 
     try {
-      const response = await fetch(`${getApiUrl()}/api/subscribe`, {
+      // ✅ On utilise maintenant API_URL au lieu de getApiUrl()
+      const response = await fetch(`${API_URL}/subscribe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
