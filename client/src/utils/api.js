@@ -1,5 +1,4 @@
 export const getApiUrl = () => {
-	return window.location.hostname === 'localhost' 
-	  ? 'http://localhost:8000' 
-	  : '';
+	return process.env.REACT_APP_API_URL;
   };
+  
