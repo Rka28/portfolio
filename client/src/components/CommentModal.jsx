@@ -49,10 +49,11 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
   const fetchComments = async () => {
     try {
       setError('');
-      const response = await fetch(`${getApiUrl()}/api/comments/${projectId}`);
-
+      const id = parseInt(projectId, 10); // ✅ Convertit "02" → 2
+      const response = await fetch(`${getApiUrl()}/api/comments/${id}`);
+  
       if (!response.ok) throw new Error(`Erreur serveur : ${response.status}`);
-
+  
       const data = await response.json();
       if (data.success) setComments(data.comments);
       else setError(data.message || 'Impossible de charger les commentaires.');
@@ -61,6 +62,7 @@ const CommentModal = ({ isOpen, onClose, projectId, projectTitle }) => {
       setComments([]);
     }
   };
+  
 
   const fetchReplies = async (commentId) => {
     try {
