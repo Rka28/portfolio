@@ -1,187 +1,145 @@
-const { pool } = require('../config/db');
+// server/models/comments.js
+const { supabase } = require('../config/db');
 const bcrypt = require('bcrypt');
-const SALT_ROUNDS = 10; // Number of salt rounds for bcrypt
+const SALT_ROUNDS = 10;
 
-// Comments model for project comments
 const commentsModel = {
-  // Create the comments table if it doesn't exist
+  // 🔹 Ces fonctions ne créent plus de tables (Supabase les gère)
   createTable: async () => {
-    try {
-      const connection = await pool.getConnection();
-      await connection.query(`
-        CREATE TABLE IF NOT EXISTS comments (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          project_id VARCHAR(10) NOT NULL,
-          name VARCHAR(255) NOT NULL,
-          email VARCHAR(255) NOT NULL,
-          comment TEXT NOT NULL,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          is_read BOOLEAN DEFAULT FALSE,
-          parent_id INT NULL,
-          FOREIGN KEY (parent_id) REFERENCES comments(id) ON DELETE CASCADE
-        )
-      `);
-      connection.release();
-      console.log('Comments table created or already exists');
-      return true;
-    } catch (error) {
-      console.error('Error creating comments table:', error);
-      return false;
-    }
+    console.log('✅ Comments table managed via Supabase Dashboard');
+    return true;
   },
 
-  // Create the users table if it doesn't exist
   createUsersTable: async () => {
-    try {
-      const connection = await pool.getConnection();
-      await connection.query(`
-        CREATE TABLE IF NOT EXISTS users (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          email VARCHAR(255) NOT NULL UNIQUE,
-          password VARCHAR(255) NOT NULL,
-          name VARCHAR(255) NOT NULL,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          last_login TIMESTAMP NULL
-        )
-      `);
-      connection.release();
-      console.log('Users table created or already exists');
-      return true;
-    } catch (error) {
-      console.error('Error creating users table:', error);
-      return false;
-    }
+    console.log('✅ Users table managed via Supabase Dashboard');
+    return true;
   },
 
-  // Add a new comment
+  // 🔹 Ajouter un commentaire
   addComment: async (projectId, name, email, comment, parentId = null) => {
     try {
-      const connection = await pool.getConnection();
-      const [result] = await connection.query(
-        'INSERT INTO comments (project_id, name, email, comment, parent_id) VALUES (?, ?, ?, ?, ?)',
-        [projectId, name, email, comment, parentId]
-      );
-      connection.release();
-      return { success: true, id: result.insertId };
+      const { data, error } = await supabase
+        .from('comments')
+        .insert([{ project_id: projectId, name, email, comment, parent_id: parentId }])
+        .select();
+
+      if (error) throw error;
+      return { success: true, id: data[0].id };
     } catch (error) {
-      console.error('Error adding comment:', error);
+      console.error('❌ Error adding comment:', error.message);
       return { success: false, error: error.message };
     }
   },
 
-  // Get all comments for a project
+  // 🔹 Récupérer tous les commentaires d’un projet
   getCommentsByProject: async (projectId) => {
     try {
-      const connection = await pool.getConnection();
-      const [rows] = await connection.query(
-        `SELECT c.*, 
-          (SELECT COUNT(*) FROM comments WHERE parent_id = c.id) as reply_count 
-         FROM comments c 
-         WHERE c.project_id = ? AND c.parent_id IS NULL 
-         ORDER BY c.created_at DESC`,
-        [projectId]
+      const { data, error } = await supabase
+        .from('comments')
+        .select('*')
+        .eq('project_id', projectId)
+        .is('parent_id', null)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Ajouter le nombre de réponses à chaque commentaire
+      const commentsWithReplies = await Promise.all(
+        data.map(async (comment) => {
+          const { count } = await supabase
+            .from('comments')
+            .select('*', { count: 'exact', head: true })
+            .eq('parent_id', comment.id);
+          return { ...comment, reply_count: count || 0 };
+        })
       );
-      connection.release();
-      return { success: true, comments: rows };
+
+      return { success: true, comments: commentsWithReplies };
     } catch (error) {
-      console.error('Error getting comments:', error);
+      console.error('❌ Error fetching comments:', error.message);
       return { success: false, error: error.message };
     }
   },
 
-  // Get replies for a comment
+  // 🔹 Récupérer les réponses à un commentaire
   getReplies: async (commentId) => {
     try {
-      const connection = await pool.getConnection();
-      const [rows] = await connection.query(
-        'SELECT * FROM comments WHERE parent_id = ? ORDER BY created_at ASC',
-        [commentId]
-      );
-      connection.release();
-      return { success: true, replies: rows };
+      const { data, error } = await supabase
+        .from('comments')
+        .select('*')
+        .eq('parent_id', commentId)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      return { success: true, replies: data };
     } catch (error) {
-      console.error('Error getting replies:', error);
+      console.error('❌ Error fetching replies:', error.message);
       return { success: false, error: error.message };
     }
   },
 
-  // Get comments by user email
+  // 🔹 Récupérer les commentaires d’un utilisateur
   getCommentsByUser: async (email) => {
     try {
-      const connection = await pool.getConnection();
-      const [rows] = await connection.query(
-        `SELECT c.*, 
-          (SELECT COUNT(*) FROM comments WHERE parent_id = c.id) as reply_count 
-         FROM comments c 
-         WHERE c.email = ? 
-         ORDER BY c.created_at DESC`,
-        [email]
-      );
-      connection.release();
-      return { success: true, comments: rows };
+      const { data, error } = await supabase
+        .from('comments')
+        .select('*')
+        .eq('email', email)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return { success: true, comments: data };
     } catch (error) {
-      console.error('Error getting user comments:', error);
+      console.error('❌ Error fetching user comments:', error.message);
       return { success: false, error: error.message };
     }
   },
 
-  // Register a new user
+  // 🔹 Inscription d’un utilisateur
   registerUser: async (email, password, name) => {
     try {
-      // Hash the password before storing it
       const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-      
-      const connection = await pool.getConnection();
-      const [result] = await connection.query(
-        'INSERT INTO users (email, password, name) VALUES (?, ?, ?)',
-        [email, hashedPassword, name]
-      );
-      connection.release();
-      return { success: true, id: result.insertId };
+
+      const { data, error } = await supabase
+        .from('users')
+        .insert([{ email, password: hashedPassword, name }])
+        .select();
+
+      if (error) throw error;
+      return { success: true, id: data[0].id };
     } catch (error) {
-      console.error('Error registering user:', error);
+      console.error('❌ Error registering user:', error.message);
       return { success: false, error: error.message };
     }
   },
 
-  // Login user
+  // 🔹 Connexion d’un utilisateur
   loginUser: async (email, password) => {
     try {
-      const connection = await pool.getConnection();
-      
-      // First, get the user by email to retrieve the hashed password
-      const [rows] = await connection.query(
-        'SELECT id, email, name, password FROM users WHERE email = ?',
-        [email]
-      );
-      
-      let success = false;
-      let user = null;
-      
-      // If user exists, compare the provided password with the stored hash
-      if (rows.length > 0) {
-        const match = await bcrypt.compare(password, rows[0].password);
-        
-        if (match) {
-          success = true;
-          user = {
-            id: rows[0].id,
-            email: rows[0].email,
-            name: rows[0].name
-          };
-          
-          // Update last login timestamp
-          await connection.query(
-            'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?',
-            [rows[0].id]
-          );
-        }
-      }
-      
-      connection.release();
-      return { success, user };
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single();
+
+      if (error) throw error;
+      if (!data) return { success: false, message: 'Utilisateur non trouvé' };
+
+      const match = await bcrypt.compare(password, data.password);
+      if (!match) return { success: false, message: 'Mot de passe incorrect' };
+
+      // Mise à jour du dernier login
+      await supabase
+        .from('users')
+        .update({ last_login: new Date() })
+        .eq('id', data.id);
+
+      return {
+        success: true,
+        user: { id: data.id, name: data.name, email: data.email }
+      };
     } catch (error) {
-      console.error('Error logging in user:', error);
+      console.error('❌ Error logging in user:', error.message);
       return { success: false, error: error.message };
     }
   }
