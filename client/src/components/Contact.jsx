@@ -165,7 +165,7 @@ export const Contact = () => {
                 {formErrors.message && <p className="text-red-400 text-sm mt-1">{formErrors.message}</p>}
               </div>
 
-              <ReCAPTCHA ref={recaptchaRef} sitekey="6LdfIMEqAAAAAM9n3D9Q_izB3_-s7k6W4UBW-C3Y" />
+              <ReCAPTCHA ref={recaptchaRef} sitekey="6Lfp2gEsAAAAAMA8Pr_EXDls4un8oG2AAuLLM0CZ" />
 
               <button 
                 type="submit" 
