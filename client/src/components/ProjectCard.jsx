@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import VC from '../Asset/4M.png'
 import LOL from '../Asset/LOL.png'
+import LSLs from '../Asset/LSL.png'
 import Snap from '../Asset/Snap.png'
 import LSL from '../Asset/lsl.png'
 
@@ -16,7 +17,7 @@ const ProjectCard = () => {
       icon: LSL,
       title: 'SITE LE STUDIO LED',
       number: '01',
-      description: 'Création d’un site internet pour l’entreprise où j’ai effectué mon alternance.',
+      description: 'Création d’un site internet pour l’entreprise LE STUDIO LED',
       link: 'https://lestudioled.com/',
       size: 'h-[450px]'
     },
@@ -32,6 +33,7 @@ const ProjectCard = () => {
       icon: Snap,
       title: 'SNAPCHAT',
       number: '03',
+      link: '      https://github.com/EpitechWebAcademiePromo2025/W-JSC-502-PAR-2-1-snapchat-moussa-junior.fofana',
 
       description: 'L’application Snapchat, grâce à une API, offre la possibilité d’envoyer des messages et de prendre des photos.',
       size: 'h-[500px]'

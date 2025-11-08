@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import { FaEnvelope, FaPaperPlane } from 'react-icons/fa';
 
-// Composant Newsletter
 const Newsletter = () => {
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState({
     submitted: false,
@@ -25,14 +26,14 @@ const Newsletter = () => {
       setStatus({
         submitted: true,
         success: false,
-        message: "Veuillez entrer une adresse e-mail valide."
+        message: t('common.newsletter.invalidEmail')
       });
       setLoading(false);
       return;
     }
 
     try {
-      // Envoi de la requête d’abonnement à l’API du serveur
+      // Envoi de la requête d'abonnement à l'API du serveur
       const response = await fetch('http://localhost:8000/api/subscribe', {
         method: 'POST',
         headers: {
@@ -47,18 +48,18 @@ const Newsletter = () => {
         setStatus({
           submitted: true,
           success: true,
-          message: "🎉 Vous êtes maintenant abonné à la newsletter !"
+          message: t('common.newsletter.success')
         });
         setEmail('');
       } else {
-        throw new Error(data.message || "Échec de l’abonnement à la newsletter.");
+        throw new Error(data.message || 'Failed to subscribe');
       }
     } catch (error) {
-      console.error("Erreur lors de l’abonnement à la newsletter :", error);
+      console.error('Newsletter subscription error:', error);
       setStatus({
         submitted: true,
         success: false,
-        message: "Une erreur est survenue lors de votre inscription à la newsletter."
+        message: t('common.newsletter.error')
       });
     } finally {
       setLoading(false);
@@ -74,12 +75,12 @@ const Newsletter = () => {
               <FaEnvelope className="text-black text-2xl" />
             </div>
             <h2 className="text-3xl font-bold bg-gradient-to-r from-[#FFB86C] to-[#FF6B6B] bg-clip-text text-transparent">
-              Abonnez-vous à notre newsletter
+              {t('common.newsletter.title')}
             </h2>
           </div>
 
           <p className="text-center text-gray-300 mb-8">
-            Recevez nos dernières actualités, projets et conseils directement dans votre boîte mail.
+            {t('common.newsletter.info')}
           </p>
 
           <form onSubmit={handleSubmit} className="relative">
@@ -88,7 +89,7 @@ const Newsletter = () => {
                 type="email"
                 value={email}
                 onChange={handleChange}
-                placeholder="Entrez votre adresse e-mail"
+                placeholder={t('common.newsletter.placeholder')}
                 className="w-full px-6 py-4 bg-[#0A0B1E] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB86C] text-white pr-36"
                 required
               />
@@ -121,7 +122,7 @@ const Newsletter = () => {
                 ) : (
                   <FaPaperPlane className="mr-2" />
                 )}
-                S’abonner
+                {t('common.newsletter.subscribe')}
               </button>
             </div>
 
@@ -139,7 +140,7 @@ const Newsletter = () => {
           </form>
 
           <div className="mt-6 text-center text-sm text-gray-400">
-            <p>Nous respectons votre vie privée. Vous pouvez vous désabonner à tout moment.</p>
+            <p>{t('common.newsletter.privacy')}</p>
           </div>
         </div>
       </div>

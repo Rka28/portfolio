@@ -5,8 +5,11 @@ import PortfolioPage from '../components/PortfolioPage';
 import ProjectCard from '../components/ProjectCard';
 import ScrollAnimation from '../components/ScrollAnimation ';
 import Skill from '../components/Skill';
+import About from '../components/AboutSection';
 import Contact from '../components/Contact';
-import Newsletter from '../components/Newsletter';
+
+
+import Newsletter from '../components/emailService';
 const HomePage = () => {
   return (
     <main className="min-h-screen w-full bg-black">
@@ -15,6 +18,7 @@ const HomePage = () => {
         puis HorizontalScroll. L'ordre est à adapter selon vos besoins 
       */}
       <PortfolioPage />
+      <About />
       <ScrollAnimation />
       <ProjectCard />
       <Skill />
